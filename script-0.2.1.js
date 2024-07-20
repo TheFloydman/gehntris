@@ -1,17 +1,11 @@
 class Board {
-
-    squareSize: number;
-    width: number;
-    height: number;
-    state: Square[][] = [];
-
-    constructor(squareSize: number, width: number, height: number) {
+    constructor(squareSize, width, height) {
+        this.state = [];
         this.squareSize = squareSize;
         this.width = width;
         this.height = height;
         this.clear();
     }
-
     clear() {
         for (let i = 0; i < this.height; i++) {
             this.state[i] = [];
@@ -20,49 +14,29 @@ class Board {
             }
         }
     }
-
 }
-
 class PieceTemplate {
-
-    shape: boolean[][];
-    border: string;
-    fill: string;
-
-    constructor(shape: boolean[][], border: string, fill: string) {
+    constructor(shape, border, fill) {
         this.shape = shape;
         this.border = border;
         this.fill = fill;
     }
-
 }
-
 class Square {
-
-    x: number;
-    y: number;
-    piece: PieceInPlay;
-    svgElement: SVGElement;
-    border: string;
-    fill: string;
-
-    constructor(x: number, y: number, border: string, fill: string) {
+    constructor(x, y, border, fill) {
         this.x = x;
         this.y = y;
         this.border = border;
         this.fill = fill;
     }
-
-    draw(x: number, y: number, board: Board, svgCanvas: SVGElement, waiting: boolean = false) {
+    draw(x, y, board, svgCanvas, waiting = false) {
         this.svgElement = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
         const svgBorder = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         svgBorder.setAttribute("width", board.squareSize.toString());
         svgBorder.setAttribute("height", board.squareSize.toString());
         svgBorder.setAttribute("x", (x + (this.x * board.squareSize)).toString());
         svgBorder.setAttribute("y", (y + (this.y * board.squareSize)).toString());
         svgBorder.setAttribute("fill", this.border);
-
         const svgFill = document.createElementNS("http://www.w3.org/2000/svg", "rect");
         svgFill.setAttribute("width", (board.squareSize - 2).toString());
         svgFill.setAttribute("height", (board.squareSize - 2).toString());
@@ -70,12 +44,10 @@ class Square {
         svgFill.setAttribute("y", (y + (this.y * board.squareSize) + 1).toString());
         svgFill.setAttribute("fill", this.fill);
         svgBorder.append(svgFill);
-
         this.svgElement.append(svgBorder, svgFill);
         svgCanvas.append(this.svgElement);
     }
-
-    canMove(x: number, y: number, board: Board): boolean {
+    canMove(x, y, board) {
         const newX = this.x + x;
         const newY = this.y + y;
         const newSpaceOccupied = board.state[newY] && board.state[newY][newX];
@@ -85,28 +57,21 @@ class Square {
         const floorCrossed = newY >= board.height;
         return !newSpaceOccupied && !leftWallCrossed && !rightWallCrossed && !ceilingCrossed && !floorCrossed;
     }
-
-    move(x: number, y: number, board: Board) {
-
+    move(x, y, board) {
         if (this.canMove(x, y, board)) {
-            this.x += x;
-            this.y += y;
+            this.setPos(x, y, board);
         }
-
     }
-
+    setPos(x, y, board) {
+        this.x += x;
+        this.y += y;
+    }
 }
-
 class PieceInPlay {
-
-    template: PieceTemplate;
-    squares: Square[] = [];
-    shadowSquares: Square[] = [];
-    border: string;
-    fill: string;
-    waiting: boolean;
-
-    constructor(template: PieceTemplate, waiting: boolean = false) {
+    constructor(template, waiting = false) {
+        this.squares = [];
+        this.shadowSquares = [];
+        this.ticksAlive = 0;
         this.template = template;
         this.border = template.border;
         this.fill = template.fill;
@@ -119,8 +84,7 @@ class PieceInPlay {
             }
         }
     }
-
-    draw(x: number, y: number, board: Board, svgInfo: SVGElement, svgMain: SVGElement) {
+    draw(x, y, board, svgInfo, svgMain) {
         if (!this.waiting) {
             this.drawShadow(board, svgInfo, svgMain);
         }
@@ -128,8 +92,7 @@ class PieceInPlay {
             this.squares[i].draw(x, y, board, this.waiting ? svgInfo : svgMain, this.waiting);
         }
     }
-
-    drawShadow(board: Board, svgInfo: SVGElement, svgMain: SVGElement) {
+    drawShadow(board, svgInfo, svgMain) {
         for (let i = 0; i < this.shadowSquares.length; i++) {
             this.shadowSquares[i].svgElement.remove();
         }
@@ -146,34 +109,31 @@ class PieceInPlay {
             this.shadowSquares[i].draw(0, 0, board, svgMain);
         }
     }
-
-    canMove(x: number, y: number, board: Board): boolean {
-
+    canMove(x, y, board) {
         for (let i = 0; i < this.squares.length; i++) {
             const currentSquare = this.squares[i];
             if (!currentSquare.canMove(x, y, board)) {
                 return false;
             }
         }
-
         return true;
-
     }
-
-    move(x: number, y: number, board: Board) {
-
+    move(x, y, board) {
         let canMove = this.canMove(x, y, board);
-
         if (canMove) {
             for (let i = 0; i < this.squares.length; i++) {
                 const currentSquare = this.squares[i];
                 currentSquare.move(x, y, board);
             }
         }
-
     }
-
-    drop(board: Board) {
+    setPos(x, y, board) {
+        for (let i = 0; i < this.squares.length; i++) {
+            const currentSquare = this.squares[i];
+            currentSquare.setPos(x, y, board);
+        }
+    }
+    drop(board) {
         let yOffset = 1;
         while (this.canMove(0, yOffset, board)) {
             yOffset++;
@@ -181,9 +141,7 @@ class PieceInPlay {
         yOffset--;
         this.move(0, yOffset, board);
     }
-
-    /** Returns true if the spaces this piece occupies are empty. */
-    convert(board: Board): boolean {
+    convert(board) {
         for (let i = 0; i < this.squares.length; i++) {
             const currentSquare = this.squares[i];
             if (board.state[currentSquare.y][currentSquare.x]) {
@@ -193,14 +151,11 @@ class PieceInPlay {
         }
         return true;
     }
-
-    rotate(board: Board) {
+    rotate(board) {
         const offsetX = Math.min(...this.squares.map(square => square.x));
         const offsetY = Math.min(...this.squares.map(square => square.y));
         const output = this.rotate2DArray(this.template.shape);
-        const newSquares: Square[] = [];
-
-        // Generate new squares based on the rotated shape
+        const newSquares = [];
         for (let i = 0; i < output.length; i++) {
             for (let j = 0; j < output[i].length; j++) {
                 if (output[i][j]) {
@@ -208,48 +163,40 @@ class PieceInPlay {
                 }
             }
         }
-
-        // Check if the new squares are within bounds and not overlapping existing pieces
         let minX = Math.min(...newSquares.map(square => square.x));
         let maxX = Math.max(...newSquares.map(square => square.x));
         let minY = Math.min(...newSquares.map(square => square.y));
         let maxY = Math.max(...newSquares.map(square => square.y));
-
         let moveX = 0;
         let moveY = 0;
-
         if (minX < 0) {
             moveX = -minX;
-        } else if (maxX >= board.width) {
+        }
+        else if (maxX >= board.width) {
             moveX = board.width - 1 - maxX;
         }
-
         if (minY < 0) {
             moveY = -minY;
-        } else if (maxY >= board.height) {
+        }
+        else if (maxY >= board.height) {
             moveY = board.height - 1 - maxY;
         }
-
         for (let square of newSquares) {
             square.x += moveX;
             square.y += moveY;
         }
-
-        // Check if the adjusted new squares are valid
         const isValid = newSquares.every(square => {
             const x = square.x;
             const y = square.y;
             return x >= 0 && x < board.width && y >= 0 && y < board.height && (!board.state[y] || !board.state[y][x]);
         });
-
         if (isValid) {
             this.template = new PieceTemplate(output, this.border, this.fill);
             this.squares = newSquares;
         }
     }
-
-    rotate2DArray(array: any[][]) {
-        const result: any[] = [];
+    rotate2DArray(array) {
+        const result = [];
         array.forEach(function (a, i, aa) {
             a.forEach(function (b, j, bb) {
                 result[j] = result[j] || [];
@@ -258,9 +205,7 @@ class PieceInPlay {
         });
         return result;
     }
-
 }
-
 const red = ["#961b12", "#ff695e"];
 const green = ["#10691e", "#bdffc8"];
 const orange = ["#db8700", "#ffd99c"];
@@ -280,61 +225,53 @@ const templateBoiler = new PieceTemplate([[true, true], [true, true]], colorComb
 const templateTemple = new PieceTemplate([[true, true, false], [true, true, true]], colorCombos[randomIndices[2]][0], colorCombos[randomIndices[2]][1]);
 const templateSurvey = new PieceTemplate([[true, false], [true, false], [true, true]], colorCombos[randomIndices[3]][0], colorCombos[randomIndices[3]][1]);
 const templateJungle = new PieceTemplate([[true, true, true, true], [true, true, true, true], [false, true, true, true]], colorCombos[randomIndices[4]][0], colorCombos[randomIndices[4]][1]);
-const templateStraight = new PieceTemplate([[true, true, true, true, true]], colorCombos[randomIndices[5]][0], colorCombos[randomIndices[5]][1])
+const templateStraight = new PieceTemplate([[true, true, true, true, true]], colorCombos[randomIndices[5]][0], colorCombos[randomIndices[5]][1]);
 const allTemplates = [templatePrison, templateBoiler, templateTemple, templateSurvey, templateJungle, templateStraight];
-
 const squareSize = 8;
-const boardSize = { x: 10, y: 23 };
+const boardSize = { x: 10, y: 25 };
 const infoSize = { x: 5, y: 4 };
-const board: Board = new Board(squareSize, boardSize.x, boardSize.y);
-
-let svgMain: SVGElement;
-let svgInfo: SVGElement;
+const board = new Board(squareSize, boardSize.x, boardSize.y);
+let svgMain;
+let svgInfo;
 let tickTime = 1000;
-let tickTimer: number = undefined;
-let pieceInPlay: PieceInPlay;
-let pieceInWaiting: PieceInPlay;
+let tickTimer = undefined;
+let pieceInPlay;
+let pieceInWaiting;
 let okayToAddPiece = true;
 let isGameOver = false;
 let isPaused = true;
 let score = 0;
 let levelGlobal = 0;
 let linesCleared = 0;
-
+let gameTicks = 0;
 function onBodyLoad() {
     setBoardProperties();
     addEventListeners();
 }
-
 function setBoardProperties() {
-    svgMain = <SVGElement><unknown>document.getElementById("svg-main");
+    svgMain = document.getElementById("svg-main");
     svgMain.setAttribute("viewBox", `0 0 ${boardSize.x * squareSize} ${boardSize.y * squareSize}`);
     svgMain.style.maxWidth = "256px";
     svgMain.style.width = "100%";
-
-    svgInfo = <SVGElement><unknown>document.getElementById("svg-info");
+    svgInfo = document.getElementById("svg-info");
     svgInfo.setAttribute("viewBox", `0 0 ${infoSize.x * squareSize} ${infoSize.y * squareSize}`);
     svgInfo.style.maxWidth = "128px";
     svgInfo.style.width = "100%";
-
     addPieceToWaiting();
 }
-
 function addPieceToWaiting() {
     const randomPiece = allTemplates[Math.floor(Math.random() * allTemplates.length)];
     const foo = new PieceInPlay(randomPiece, true);
     pieceInWaiting = foo;
 }
-
 function addPieceToBoard() {
     pieceInPlay = pieceInWaiting;
-    pieceInPlay.move(3, 0, board)
+    pieceInPlay.move(3, 0, board);
     pieceInPlay.waiting = false;
     addPieceToWaiting();
     okayToAddPiece = false;
 }
-
-function convertPiece(piece: PieceInPlay): boolean {
+function convertPiece(piece) {
     const continueGame = piece.convert(board);
     if (continueGame) {
         pieceInPlay = undefined;
@@ -344,7 +281,6 @@ function convertPiece(piece: PieceInPlay): boolean {
     addToScore(5);
     return continueGame;
 }
-
 function clearLines() {
     let currentLinesCleared = 0;
     let fullLine = scanForFullLines();
@@ -355,12 +291,12 @@ function clearLines() {
                 if (board.state[i - 1][j]) {
                     board.state[i][j] = board.state[i - 1][j];
                     board.state[i][j].y += 1;
-                } else {
+                }
+                else {
                     board.state[i][j] = undefined;
                 }
             }
         }
-        // Clear the top row
         for (let j = 0; j < board.state[0].length; j++) {
             board.state[0][j] = undefined;
         }
@@ -369,30 +305,25 @@ function clearLines() {
     addToScore(currentLinesCleared == 5 ? currentLinesCleared * 125 : currentLinesCleared * 25);
     increaseLinesCleared(currentLinesCleared);
 }
-
-function addToScore(points: number) {
+function addToScore(points) {
     score += points;
     setScore(score);
 }
-
-function setScore(score: number) {
+function setScore(score) {
     document.getElementById("score-value").innerHTML = score.toString();
 }
-
-function increaseLinesCleared(lines: number) {
+function increaseLinesCleared(lines) {
     linesCleared += lines;
     setLevel(Math.floor(linesCleared / 5) + 1);
     clearInterval(tickTimer);
     startTickTimer();
 }
-
-function setLevel(level: number) {
+function setLevel(level) {
     levelGlobal = level;
     document.getElementById("level-value").innerHTML = level.toString();
     tickTime = 1000 - (50 * (level + 1));
 }
-
-function scanForFullLines(): number {
+function scanForFullLines() {
     for (let i = 0; i < board.state.length; i++) {
         let complete = true;
         for (let j = 0; j < board.state[i].length; j++) {
@@ -407,19 +338,18 @@ function scanForFullLines(): number {
     }
     return -1;
 }
-
 function doGameOver() {
     clearInterval(tickTimer);
-    const gameOverSvg = <SVGElement><unknown>document.getElementById("game-over").cloneNode(true);
+    const gameOverSvg = document.getElementById("game-over").cloneNode(true);
     svgMain.append(gameOverSvg);
     document.getElementById("pause-button").innerHTML = "Restart";
     isGameOver = true;
     board.clear();
 }
-
 function togglePause() {
     if (isGameOver) {
         svgMain.innerHTML = "";
+        gameTicks = 0;
         score = 0;
         linesCleared = 0;
         levelGlobal = 0;
@@ -435,35 +365,33 @@ function togglePause() {
     isPaused = !isPaused;
     if (isPaused) {
         doPause();
-    } else {
+    }
+    else {
         undoPause();
     }
 }
-
 function doPause() {
     document.getElementById("pause-button").innerHTML = "Resume";
     clearInterval(tickTimer);
-    const pauseSvg = <SVGElement><unknown>document.getElementById("pause").cloneNode(true);
+    const pauseSvg = document.getElementById("pause").cloneNode(true);
     pauseSvg.id = "pause-copy";
     svgMain.append(pauseSvg);
 }
-
 function undoPause() {
     document.getElementById("pause-button").innerHTML = "Pause";
     document.getElementById("pause-copy")?.remove();
+    if (gameTicks == 0) {
+        tick();
+    }
     startTickTimer();
 }
-
 function startTickTimer() {
     tickTimer = setInterval(tick, tickTime);
 }
-
 function tick() {
     let isGameOver = false;
     svgMain.innerHTML = "";
     svgInfo.innerHTML = "";
-
-    // Draw all stationary squares.
     for (let i = 0; i < board.state.length; i++) {
         for (let j = 0; j < board.state[i].length; j++) {
             if (board.state[i][j] != undefined) {
@@ -471,12 +399,15 @@ function tick() {
             }
         }
     }
-
     if (!isPaused) {
         if (pieceInPlay) {
+            pieceInPlay.ticksAlive++;
             if (pieceInPlay.canMove(0, 1, board)) {
-                pieceInPlay.move(0, 1, board);
-            } else {
+                if (pieceInPlay.ticksAlive > 1) {
+                    pieceInPlay.move(0, 1, board);
+                }
+            }
+            else {
                 isGameOver = !convertPiece(pieceInPlay);
                 clearLines();
                 if (!isGameOver) {
@@ -485,127 +416,170 @@ function tick() {
                 }
             }
         }
-
         if (okayToAddPiece) {
             addPieceToBoard();
         }
     }
-
     pieceInWaiting.draw(0, 0, board, svgInfo, svgMain);
-
     if (pieceInPlay) {
         pieceInPlay.draw(0, 0, board, svgInfo, svgMain);
     }
-
     if (isGameOver) {
         doGameOver();
     }
+    gameTicks++;
 }
-
 function addEventListeners() {
-
-    const pauseButton: HTMLButtonElement = <HTMLButtonElement><unknown>document.getElementById("pause-button");
+    let actionHandled = false;
+    let touchStartX = 0;
+    let touchStartY = 0;
+    let touchEndX = 0;
+    let touchEndY = 0;
+    let touchTime = 50;
+    let touchTimer = undefined;
+    let timeDown = 0;
+    let cancelNext = false;
+    const pauseButton = document.getElementById("pause-button");
     pauseButton.addEventListener("click", (event) => {
         pauseButton.blur();
         event.stopPropagation();
     });
-
-    // Event listener for keyboard input
     document.addEventListener("keydown", event => {
         if (!isGameOver && !isPaused && pieceInPlay) {
             if (event.code == "ArrowLeft" || event.code == "KeyA") {
                 movePieceLeft();
-            } else if (event.code == "ArrowRight" || event.code == "KeyD") {
+            }
+            else if (event.code == "ArrowRight" || event.code == "KeyD") {
                 movePieceRight();
-            } else if (event.code == "ArrowDown" || event.code == "KeyS") {
+            }
+            else if (event.code == "ArrowDown" || event.code == "KeyS") {
                 movePieceDown();
-            } else if (event.code == "ArrowUp" || event.code == "KeyW") {
+            }
+            else if (event.code == "ArrowUp" || event.code == "KeyW") {
                 rotatePiece();
-            } else if (event.code == "Space") {
+            }
+            else if (event.code == "Space") {
                 dropPiece();
-            } else if (event.code == "Escape") {
+            }
+            else if (event.code == "Escape") {
                 togglePause();
             }
             event.preventDefault();
         }
     });
-
-    // Variables to track touch start position
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchEndX = 0;
-    let touchEndY = 0;
-
-    // Event listener for touch start
-    document.addEventListener("touchstart", event => {
-        touchStartX = event.touches[0].clientX;
-        touchStartY = event.touches[0].clientY;
-    });
-
-    // Event listener for touch end
-    document.addEventListener("touchend", event => {
-        touchEndX = event.changedTouches[0].clientX;
-        touchEndY = event.changedTouches[0].clientY;
-        handleTouchGesture();
-    });
-
-    // Event listener for clicks (taps)
-    document.addEventListener("click", event => {
-        if (!isGameOver && !isPaused && pieceInPlay) {
-            rotatePiece();
-        }
-    });
-
-    function handleTouchGesture() {
-        const deltaX = touchEndX - touchStartX;
-        const deltaY = touchEndY - touchStartY;
-
-        // Determine if the swipe was primarily horizontal or vertical
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
-            // Horizontal swipe
-            if (deltaX > 50) {
-                movePieceRight();
-            } else if (deltaX < -50) {
-                movePieceLeft();
+    ["mousemove", "touchmove"].forEach(eventName => {
+        document.addEventListener(eventName, function (event) {
+            touchEndX = 0;
+            touchEndY = 0;
+            cancelNext = false;
+            if (event instanceof MouseEvent) {
+                touchEndX = event.clientX;
+                touchEndY = event.clientY;
             }
-        } else {
-            // Vertical swipe
-            if (deltaY > 50) {
-                movePieceDown();
-            } else if (deltaY < -50) {
-                dropPiece();
+            else {
+                touchEndX = event.changedTouches[0].clientX;
+                touchEndY = event.changedTouches[0].clientY;
             }
+        });
+    });
+    ["mousedown", "touchstart"].forEach(eventName => {
+        document.addEventListener(eventName, function (event) {
+            touchStartX = 0;
+            touchStartY = 0;
+            cancelNext = false;
+            if (event instanceof MouseEvent) {
+                touchStartX = event.clientX;
+                touchStartY = event.clientY;
+            }
+            else {
+                touchStartX = event.touches[0].clientX;
+                touchStartY = event.touches[0].clientY;
+            }
+            timeDown = 0;
+            clearInterval(touchTimer);
+            touchTimer = setInterval(touchTimerUpdater, touchTime);
+        });
+    });
+    ["mouseup", "touchend"].forEach(eventName => {
+        document.addEventListener(eventName, function (event) {
+            if (event instanceof MouseEvent) {
+                touchEndX = event.clientX;
+                touchEndY = event.clientY;
+            }
+            else {
+                touchEndX = event.changedTouches[0].clientX;
+                touchEndY = event.changedTouches[0].clientY;
+            }
+            handleMouseAndTouch();
+            clearInterval(touchTimer);
+            touchStartX = 0;
+            touchStartY = 0;
+            touchEndX = 0;
+            touchEndY = 0;
+            cancelNext = true;
+        });
+    });
+    function touchTimerUpdater() {
+        actionHandled = false;
+        timeDown += touchTime;
+        if (timeDown % 250 == 0 && !cancelNext) {
+            handleMouseAndTouch();
         }
     }
-
+    function handleMouseAndTouch() {
+        if (!isGameOver && !isPaused && pieceInPlay && !actionHandled) {
+            const deltaX = touchEndX - touchStartX;
+            const deltaY = touchEndY - touchStartY;
+            if (Math.abs(deltaX) > Math.abs(deltaY)) {
+                if (deltaX > 50) {
+                    movePieceRight();
+                }
+                else if (deltaX < -50) {
+                    movePieceLeft();
+                }
+                else if (timeDown < 250) {
+                    rotatePiece();
+                }
+            }
+            else {
+                if (deltaY > 50) {
+                    movePieceDown();
+                }
+                else if (deltaY < -50 && timeDown < 250) {
+                    dropPiece();
+                }
+                else if (timeDown < 250) {
+                    rotatePiece();
+                }
+            }
+            actionHandled = true;
+            cancelNext = false;
+        }
+    }
     function movePieceLeft() {
         if (pieceInPlay.canMove(-1, 0, board)) {
             pieceInPlay.move(-1, 0, board);
             redrawPieceInPlay();
         }
     }
-
     function movePieceRight() {
         if (pieceInPlay.canMove(1, 0, board)) {
             pieceInPlay.move(1, 0, board);
             redrawPieceInPlay();
         }
     }
-
     function movePieceDown() {
         if (pieceInPlay.canMove(0, 1, board)) {
             pieceInPlay.move(0, 1, board);
             redrawPieceInPlay();
         }
     }
-
     function dropPiece() {
         if (pieceInPlay.canMove(0, 1, board)) {
             pieceInPlay.drop(board);
             redrawPieceInPlay();
         }
     }
-
     function rotatePiece() {
         for (let i = 0; i < pieceInPlay.squares.length; i++) {
             pieceInPlay.squares[i].svgElement.remove();
@@ -613,7 +587,6 @@ function addEventListeners() {
         pieceInPlay.rotate(board);
         pieceInPlay.draw(0, 0, board, svgInfo, svgMain);
     }
-
     function redrawPieceInPlay() {
         for (let i = 0; i < pieceInPlay.squares.length; i++) {
             pieceInPlay.squares[i].svgElement.remove();
@@ -621,3 +594,4 @@ function addEventListeners() {
         pieceInPlay.draw(0, 0, board, svgInfo, svgMain);
     }
 }
+//# sourceMappingURL=script-0.2.1.js.map

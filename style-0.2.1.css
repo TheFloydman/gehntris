@@ -1,15 +1,26 @@
 body {
     font-family: sans-serif;
+    background-color: white;
+    height: 100vh;
+    max-height: 896px;
 }
 
 div#main-container {
-    width: max-content;
-    max-width: 400px;
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 0;
+    margin: 0;
+    height: 100%;
 }
 
-div#svg-container {
+div#gameplay-container {
     display: flex;
     align-items: start;
+    justify-content: space-between;
     gap: 16px;
 }
 
@@ -30,7 +41,6 @@ text.overlay-text {
 div#upcoming {
     font-weight: bold;
     text-align: center;
-    margin-bottom: 8px;
 }
 
 div#below {
@@ -41,20 +51,7 @@ button#pause-button {
     width: 100%;
     aspect-ratio: 6 / 1;
     font-size: large;
-    margin-top: 8px;
-}
-
-div#header {
-    background-color: #ccebff;
-    margin-bottom: 16px;
-    padding: 8px;
-}
-
-div#title {
     font-weight: bold;
-    font-size: large;
-    text-transform: uppercase;
-    text-align: center;
 }
 
 div#info-container {
@@ -73,7 +70,6 @@ div#level-label {
 div#score-value,
 div#level-value {
     text-align: center;
-    margin-top: 8px;
 }
 
 div#info-container {
@@ -85,14 +81,7 @@ div#version {
     text-align: center;
 }
 
-button#drop-button {
-    width: 100%;
-    aspect-ratio: 3 / 1;
-}
-
-div#templates,
-div#templates>div#pause,
-div#templates>div#game-over {
+div#templates {
     display: none;
 }
 
@@ -123,4 +112,13 @@ div.intro-entries-container {
 
 div#riven {
     text-align: center;
+}
+
+.prevent-select {
+    -webkit-user-select: none;
+    /* Safari */
+    -ms-user-select: none;
+    /* IE 10 and IE 11 */
+    user-select: none;
+    /* Standard syntax */
 }
