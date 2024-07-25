@@ -3,6 +3,7 @@ body {
     background-color: white;
     height: 100vh;
     max-height: 896px;
+    touch-action: none;
 }
 
 div#main-container {
@@ -22,6 +23,7 @@ div#gameplay-container {
     align-items: start;
     justify-content: space-between;
     gap: 16px;
+    height: 100%;
 }
 
 svg#svg-main {
