@@ -1,26 +1,27 @@
 body {
     font-family: sans-serif;
-    background-color: white;
-    height: 100vh;
-    max-height: 896px;
     touch-action: none;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
 }
 
 div#main-container {
-    width: 100%;
-    max-width: 480px;
+    width: 416px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 16px;
-    padding: 0;
-    margin: 0;
-    height: 100%;
+    padding: 16px;
+    margin: auto;
+    height: 750px;
+    background-color: white;
+    z-index: 3;
 }
 
 div#gameplay-container {
     display: flex;
-    align-items: start;
     justify-content: space-between;
     gap: 16px;
     height: 100%;
@@ -31,7 +32,8 @@ svg#svg-main {
     border: 2px solid rgba(0, 0, 0, 0.6);
 }
 
-svg#svg-info {
+svg#svg-upcoming,
+svg#svg-storage {
     background: rgba(0, 0, 0, 0.1);
     border: 2px solid rgba(0, 0, 0, 0.6);
 }
@@ -40,9 +42,11 @@ text.overlay-text {
     font: bold small sans-serif;
 }
 
-div#upcoming {
+div#upcoming,
+div#storage {
     font-weight: bold;
     text-align: center;
+    margin-bottom: 4px;
 }
 
 div#below {
@@ -56,10 +60,17 @@ button#pause-button {
     font-weight: bold;
 }
 
+div#main-svg-container {
+    aspect-ratio: 10 / 25;
+    width: 256px;
+}
+
 div#info-container {
     display: flex;
     flex-direction: column;
-    gap: 64px;
+    justify-content: space-between;
+    aspect-ratio: 1 / 5;
+    width: 128px;
 }
 
 div#score-label,
@@ -124,3 +135,59 @@ div#riven {
     user-select: none;
     /* Standard syntax */
 }
+
+/* Thanks to Carla-Codes for this starry background. */
+/* https://github.com/Carla-Codes/starry-night-css-animation */
+
+@keyframes move-twink-back {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: -10000px 5000px;
+    }
+}
+
+@keyframes move-clouds-back {
+    from {
+        background-position: 0 0;
+    }
+
+    to {
+        background-position: 10000px 0;
+    }
+}
+
+.stars,
+.twinkling,
+.clouds {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.stars {
+    background: #000 url(./bg/stars.png) repeat top center;
+    z-index: 0;
+}
+
+.twinkling {
+    background: transparent url(./bg/twinkling.png) repeat top center;
+    z-index: 1;
+    animation: move-twink-back 600s linear infinite;
+}
+
+.clouds {
+    background: transparent url(./bg/clouds.png) repeat top center;
+    z-index: 2;
+    opacity: .4;
+    animation: move-clouds-back 800s linear infinite;
+}
+
+/* End of starry background from Carla-Codes. */

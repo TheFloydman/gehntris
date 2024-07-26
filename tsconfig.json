@@ -13,6 +13,6 @@
     "target": "es2021"
   },
   "files": [
-    "script-0.2.2.ts"
+    "script-0.3.0.ts"
   ]
 }

@@ -11,14 +11,19 @@
     <title>Gehntris</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style-0.2.2.css">
-    <script src="script-0.2.2.js"></script>
+    <link rel="stylesheet" href="style-0.3.0.css">
+    <script src="script-0.3.0.js"></script>
 </head>
 
 <body class="prevent-select" onload="onBodyLoad();">
     <!--[if lt IE 7]>
             <div class="browsehappy">You are using an <strong>outdated</strong> browser. Please upgrade your browser to improve your experience.</div>
         <![endif]-->
+
+    <div class="stars"></div>
+    <div class="twinkling"></div>
+    <div class="clouds"></div>
+
     <div id="main-container">
         <div id="gameplay-container">
             <div id="main-svg-container">
@@ -47,6 +52,7 @@
                                         <div><b>Rotate:</b> W, ↑, tap, or click.</div>
                                         <div><b>Down:</b> S, ↓, or swipe/hold down.</div>
                                         <div><b>Drop:</b> Spacebar or swipe up.</div>
+                                        <div><b>Store:</b> Tab or tap/click box.</div>
                                     </div>
                                 </div>
                                 <div id="points">
@@ -65,7 +71,7 @@
             <div id="info-container">
                 <div id="upcoming-container">
                     <div id="upcoming">Upcoming</div>
-                    <div><svg id="svg-info"></svg></div>
+                    <div><svg id="svg-upcoming"></svg></div>
                 </div>
                 <div id="score-container">
                     <div id="score-label">Score</div>
@@ -74,6 +80,10 @@
                 <div id="level-container">
                     <div id="level-label">Level</div>
                     <div id="level-value">1</div>
+                </div>
+                <div id="storage-container">
+                    <div id="storage">Storage</div>
+                    <div><svg id="svg-storage"></svg></div>
                 </div>
             </div>
         </div>
