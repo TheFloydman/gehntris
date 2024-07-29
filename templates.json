@@ -1,0 +1,99 @@
+{
+    "$schema": "schema-templates.json",
+    "templates": [
+        {
+            "name": "prison-island",
+            "shape": [
+                [
+                    true
+                ]
+            ],
+            "weight": 1.5
+        },
+        {
+            "name": "boiler-island",
+            "shape": [
+                [
+                    true,
+                    true
+                ],
+                [
+                    true,
+                    true
+                ]
+            ],
+            "weight": 1
+        },
+        {
+            "name": "temple-island",
+            "shape": [
+                [
+                    true,
+                    true,
+                    false
+                ],
+                [
+                    true,
+                    true,
+                    true
+                ]
+            ],
+            "weight": 1
+        },
+        {
+            "name": "survey-island",
+            "shape": [
+                [
+                    true,
+                    false
+                ],
+                [
+                    true,
+                    false
+                ],
+                [
+                    true,
+                    true
+                ]
+            ],
+            "weight": 1
+        },
+        {
+            "name": "jungle-island",
+            "shape": [
+                [
+                    true,
+                    true,
+                    true,
+                    true
+                ],
+                [
+                    true,
+                    true,
+                    true,
+                    true
+                ],
+                [
+                    false,
+                    true,
+                    true,
+                    true
+                ]
+            ],
+            "weight": 0.5
+        },
+        {
+            "name": "straight-piece",
+            "shape": [
+                [
+                    true,
+                    true,
+                    true,
+                    true,
+                    true
+                ]
+            ],
+            "weight": 1
+        }
+    ]
+}

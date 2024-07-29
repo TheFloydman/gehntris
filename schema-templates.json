@@ -1,0 +1,43 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "schema-templates.json",
+    "title": "Templates",
+    "description": "Piece templates for Gehntris.",
+    "type": "object",
+    "properties": {
+        "templates": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "type": [
+                            "string",
+                            "null"
+                        ]
+                    },
+                    "weight": {
+                        "type": [
+                            "number",
+                            "null"
+                        ]
+                    },
+                    "shape": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                },
+                "required": [
+                    "shape"
+                ]
+            },
+            "minItems": 1,
+            "uniqueItems": true
+        }
+    }
+}

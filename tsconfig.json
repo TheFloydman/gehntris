@@ -13,6 +13,7 @@
     "target": "es2021"
   },
   "files": [
-    "script-0.3.0.ts"
+    "gehntris.ts",
+    "gehntris-objects.ts"
   ]
 }

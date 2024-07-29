@@ -11,11 +11,11 @@
     <title>Gehntris</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style-0.3.0.css">
-    <script src="script-0.3.0.js"></script>
+    <link rel="stylesheet" href="gehntris.css">
+    <script src="gehntris.js"></script>
 </head>
 
-<body class="prevent-select" onload="onBodyLoad();">
+<body class="prevent-select" onload="Gehntris.onBodyLoad();">
     <!--[if lt IE 7]>
             <div class="browsehappy">You are using an <strong>outdated</strong> browser. Please upgrade your browser to improve your experience.</div>
         <![endif]-->
@@ -88,7 +88,7 @@
             </div>
         </div>
         <div id="below">
-            <button id="pause-button" onclick="togglePause();">Start</button>
+            <button id="pause-button" onclick="Gehntris.togglePause();">Start</button>
         </div>
     </div>
     <div id="templates">
